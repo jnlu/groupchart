@@ -6,43 +6,29 @@ import time
 import datetime
 import lastfmsettings
 
-def fix_duplicates(song):
-	if song == "Jax Jones - Instruction" or song == "Jax Jones - Instruction ft. Demi Lovato, Stefflon Don" or song == "Jax Jones, Demi Lovato, Stefflon Don - Instruction":
-		return("Jax Jones - Instruction (feat. Demi Lovato & Stefflon Don)")
-	elif song == "Clean Bandit - Symphony" or song == "Zara Larsson - Symphony" or song == "Zara Larsson - Symphony (feat. Clean Bandit)" or song == "Clean Bandit - Symphony (f. Zara Larsson)" or song == "Clean Bandit - Symphony feat. Zara Larsson":
-		return("Clean Bandit - Symphony (feat. Zara Larsson)")
-	elif song == "Halsey - Strangers" or song == "Halsey, Lauren Jauregui - Strangers" or song == "Halsey - Strangers  ft. Lauren Jauregui":
-		return("Halsey - Strangers (feat. Lauren Jauregui)")
-	elif song == "DJ Khaled - Wild Thoughts" or song == "DJ Khaled, Rihanna, Bryson Tiller - Wild Thoughts" or song == "DJ Khaled - Wild Thoughts ft. Rihanna, Bryson Tiller":
-		return("DJ Khaled - Wild Thoughts (feat. Rihanna & Bryson Tiller)")
-	elif song == "Calvin Harris - Feels" or song == "Calvin Harris, Pharrell Williams, Katy Perry, Big Sean - Feels":
-		return("Calvin Harris - Feels (feat. Pharrell Williams, Katy Perry & Big Sean)")
-	elif song == "Calvin Harris - Heatstroke (fEaT. yoUnG ThUG, pHaRrELl wIlLiAmS & Ariana Grande)" or song == "Calvin Harris - Heatstroke":
-		return("Calvin Harris - Heatstroke (feat. Young Thug, Pharrell Williams & Ariana Grande)")
-	elif song == "Calvin Harris - Slide" or song == "Calvin Harris - sLiDe (feat. frank ocean & MIGOS)":
-		return("Calvin Harris - Slide (feat. Frank Ocean & Migos)")
-	elif song == "Calvin Harris - Rollin":
-		return("Calvin Harris - Rollin (feat. Future & Khalid)")
-	elif song == "David Guetta - 2U (Ft. Justin Bieber)" or song == "David Guetta - 2U":
-		return("David Guetta - 2U (feat. Justin Bieber)")
-	elif song == "Luis Fonsi & Daddy Yankee - Despacito (feat. Justin Bieber) [Remix]" or song == "Luis Fonsi - Despacito - Remix":
-		return("Luis Fonsi & Daddy Yankee - Despacito (feat. Justin Bieber)")
-	elif song == "Fifth Harmony - Down" or song == "Fifth Harmony, Gucci Mane - Down":
-		return("Fifth Harmony - Down (feat. Gucci Mane)")
-	elif song == "Katy Perry - Swish Swish" or song == "Katy Perry - Swish Swish  ft. Nicki Minaj" or song == "Katy Perry - Swish Swish (Feat. Nicki Minaj)":
-		return("Katy Perry - Swish Swish (feat. Nicki Minaj)")
-	elif song == "Lorde - Hard Feelings / Loveless":
-		return("Lorde - Hard Feelings/Loveless")
-	elif song == "Katy Perry - bOn aPpétIT" or song == "Katy Perry - Bon Appetit" or song == "Katy Perry - Bon Appétit  ft. Migos":
-		return("Katy Perry - Bon Appétit (feat. Migos)")
-	elif song == "Dua Lipa - Lost In Your Light":
-		return("Dua Lipa - Lost In Your Light (feat. Miguel)")
-	elif song == "Young Thug, Millie Go Lightly - Family Don't Matter (feat. Millie Go Lightly)":
-		return("Young Thug - Family Don't Matter (feat. Millie Go Lightly)")
-	else:
-		return(song)
 
 names = open("lastfm.txt", "r") #A text file where each line is a username
+duplicates = open("duplicates.txt", "r")
+
+duplicate_array = []
+
+def get_duplicates(file, array):
+	for line in file:
+		songs = line.split("|")
+		stripped_songs = [j.strip("\n").strip(" ") for j in songs]
+		array.append(stripped_songs)
+
+get_duplicates(duplicates, duplicate_array)
+
+duplicates.close()
+
+def fix_duplicates(song, array):
+	for songs in array:
+		for i in range(len(songs)):
+			check_song = songs[i]
+			if song == check_song:
+				return songs[-1]
+	return(song)
 
 API_KEY = lastfmsettings.API_KEY
 API_SECRET = lastfmsettings.API_SECRET
@@ -52,6 +38,9 @@ password_hash = pylast.md5(lastfmsettings.password)
 
 from_date = "1497484800" #Edit these to run at different times - time is in unix
 to_date = "1498132799"
+
+from_date2 = "1483228800"
+to_date2 = "1498694400"
 
 usernames = []
 
@@ -85,7 +74,7 @@ for username in usernames:
 	except IndexError:
 		pass
 	for i in range(counter):
-		song = fix_duplicates(str(chart[i].item))
+		song = fix_duplicates(str(chart[i].item), duplicate_array)
 		weight = chart[i].weight
 		temp_rank.append((song, weight))
 	res = {}
@@ -97,6 +86,8 @@ for username in usernames:
 	all_placements = res.values()
 	for song in res:
 		weight = res[song]
+		if weight == 1 and song == "Lorde - Homemade Dynamite":
+			print(username)
 		total = all_placements.count(weight)
 		if total > 1:
 			last_place = weight + total - 1
@@ -121,5 +112,3 @@ for i in range(len(rank)):
 	outputfile.write(str(song[1]) + "|" + name + "|" + str(float(chart_full.get(name))) + "\n")
 	del rank[name]
 outputfile.close()
-
-
