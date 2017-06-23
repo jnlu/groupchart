@@ -18,10 +18,6 @@ def get_duplicates(file, array):
 		stripped_songs = [j.strip("\n").strip(" ") for j in songs]
 		array.append(stripped_songs)
 
-get_duplicates(duplicates, duplicate_array)
-
-duplicates.close()
-
 def fix_duplicates(song, array):
 	for songs in array:
 		for i in range(len(songs)):
@@ -30,17 +26,22 @@ def fix_duplicates(song, array):
 				return songs[-1]
 	return(song)
 
+get_duplicates(duplicates, duplicate_array)
+duplicates.close()
+
 API_KEY = lastfmsettings.API_KEY
 API_SECRET = lastfmsettings.API_SECRET
 
 username = lastfmsettings.username
 password_hash = pylast.md5(lastfmsettings.password)
 
-from_date = "1497484800" #Edit these to run at different times - time is in unix
-to_date = "1498132799"
+from_date = "1497571200" #Edit these to run at different times - time is in unix
+to_date = "1498175999"
 
-from_date2 = "1483228800"
-to_date2 = "1498694400"
+print(datetime.datetime.fromtimestamp(int(from_date)).strftime('%Y-%m-%d %H:%M:%S'))
+print("to")
+print(datetime.datetime.fromtimestamp(int(to_date)).strftime('%Y-%m-%d %H:%M:%S'))
+
 
 usernames = []
 
@@ -54,9 +55,15 @@ network = pylast.LastFMNetwork(api_key=API_KEY, api_secret=API_SECRET, username=
 
 chart_full = {}
 
+num_counter = 0
+
 for username in usernames:
 	user = network.get_user(username)
-	chart = user.get_weekly_track_charts(from_date=from_date, to_date=to_date)
+	try:
+		chart = user.get_weekly_track_charts(from_date=from_date, to_date=to_date)
+	except pylast.WSError:
+		print(str(user) + " was not found.")
+		continue
 	temp_rank = []
 	try:
 		chart[9]
@@ -76,7 +83,13 @@ for username in usernames:
 	for i in range(counter):
 		song = fix_duplicates(str(chart[i].item), duplicate_array)
 		weight = chart[i].weight
-		temp_rank.append((song, weight))
+		found = False
+		for i in range(len(temp_rank)):
+			if song in temp_rank[i]:
+				temp_rank[i] = (song, weight + temp_rank[i][1])
+				found = True
+		if not found:
+			temp_rank.append((song, weight))
 	res = {}
 	prev = None
 	for i,(k,v) in enumerate(temp_rank):
@@ -87,7 +100,7 @@ for username in usernames:
 	for song in res:
 		weight = res[song]
 		if weight == 1 and song == "Lorde - Homemade Dynamite":
-			print(username)
+			num_counter += 1
 		total = all_placements.count(weight)
 		if total > 1:
 			last_place = weight + total - 1
@@ -111,4 +124,6 @@ for i in range(len(rank)):
 	name = str(song[0])
 	outputfile.write(str(song[1]) + "|" + name + "|" + str(float(chart_full.get(name))) + "\n")
 	del rank[name]
+print(num_counter)
 outputfile.close()
+
