@@ -6,7 +6,6 @@ import time
 import datetime
 import lastfmsettings
 
-
 names = open("lastfm.txt", "r") #A text file where each line is a username
 duplicates = open("duplicates.txt", "r")
 
@@ -20,7 +19,7 @@ def get_duplicates(file, array):
 
 def fix_duplicates(song, array):
 	for songs in array:
-		for i in range(len(songs)):
+		for i in range(len(songs) - 1):
 			check_song = songs[i]
 			if song == check_song:
 				return songs[-1]
@@ -35,12 +34,11 @@ API_SECRET = lastfmsettings.API_SECRET
 username = lastfmsettings.username
 password_hash = pylast.md5(lastfmsettings.password)
 
-from_date = "1497571200" #Edit these to run at different times - time is in unix
-to_date = "1498175999"
+from_date = "1498176000" #Edit these to run at different times - time is in unix
+to_date = "1498780799"
 
-print(datetime.datetime.fromtimestamp(int(from_date)).strftime('%Y-%m-%d %H:%M:%S'))
-print("to")
-print(datetime.datetime.fromtimestamp(int(to_date)).strftime('%Y-%m-%d %H:%M:%S'))
+timerange = datetime.datetime.fromtimestamp(int(from_date)).strftime('%Y-%m-%d %H:%M:%S') + " to " + datetime.datetime.fromtimestamp(int(to_date)).strftime('%Y-%m-%d %H:%M:%S')
+print(timerange)
 
 
 usernames = []
@@ -99,8 +97,6 @@ for username in usernames:
 	all_placements = res.values()
 	for song in res:
 		weight = res[song]
-		if weight == 1 and song == "Lorde - Homemade Dynamite":
-			num_counter += 1
 		total = all_placements.count(weight)
 		if total > 1:
 			last_place = weight + total - 1
