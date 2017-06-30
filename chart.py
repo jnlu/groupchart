@@ -6,6 +6,7 @@ import time
 import datetime
 import lastfmsettings
 
+
 names = open("lastfm.txt", "r") #A text file where each line is a username
 duplicates = open("duplicates.txt", "r")
 
@@ -52,8 +53,6 @@ names.close()
 network = pylast.LastFMNetwork(api_key=API_KEY, api_secret=API_SECRET, username=username, password_hash=password_hash)
 
 chart_full = {}
-
-num_counter = 0
 
 for username in usernames:
 	user = network.get_user(username)
@@ -103,7 +102,7 @@ for username in usernames:
 			average = float(weight + last_place) / 2
 			rank = float(max(16 - average, 1))
 		else:
-			rank = float(16 - weight)
+			rank = float(max(16 - weight, 1))
 		if song not in chart_full:
 			chart_full[song] = 0.0
 		chart_full[song] += rank
@@ -120,6 +119,4 @@ for i in range(len(rank)):
 	name = str(song[0])
 	outputfile.write(str(song[1]) + "|" + name + "|" + str(float(chart_full.get(name))) + "\n")
 	del rank[name]
-print(num_counter)
 outputfile.close()
-
