@@ -49,11 +49,15 @@ def main():
 		name = line.strip("\n").strip()
 		if name not in usernames:
 			usernames.append(name)
+		else:
+			print(name + " appeared twice.")
 	names.close()
 
 	network = pylast.LastFMNetwork(api_key=API_KEY, api_secret=API_SECRET, username=username, password_hash=password_hash)
 
 	chart_full = {}
+	number_ones = {}
+	total_listeners = {}
 
 	for username in usernames:
 		user = network.get_user(username)
@@ -107,10 +111,17 @@ def main():
 			if song not in chart_full:
 				chart_full[song] = 0.0
 			chart_full[song] += rank
+			if song not in number_ones:
+				number_ones[song] = 0
+			if song not in total_listeners:
+				total_listeners[song] = 0
+			total_listeners[song] += 1
+			if rank == 15:
+				number_ones[song] += 1
 	chart_full_temp = reversed(sorted(chart_full.items(), key=operator.itemgetter(1)))
 	rank = {}
-	outputfile = open("chart.txt", "w")
-	outputfile.write("Rank|Song|Total Points\n---|---|---\n")
+	outputfile = open("chart_temp.txt", "w")
+	outputfile.write("Rank|Song|Total Points|Number Ones|Total Listeners\n---|---|---|---|---\n")
 	for i,(k,v) in enumerate(chart_full_temp):
 		if v!=prev:
 			place,prev = i+1,v
@@ -118,7 +129,10 @@ def main():
 	for i in range(len(rank)):
 		song = min(rank.items(), key=operator.itemgetter(1))
 		name = str(song[0])
-		outputfile.write(str(song[1]) + "|" + name + "|" + str(float(chart_full.get(name))) + "\n")
+		outputfile.write(str(song[1]) + "|" + name + "|" + str(float(chart_full.get(name))) + "|")
+		outputfile.write(str(number_ones[name]))
+		outputfile.write("|" + str(total_listeners[name]))
+		outputfile.write("\n")
 		del rank[name]
 	outputfile.close()
 main()
