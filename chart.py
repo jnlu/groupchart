@@ -12,6 +12,7 @@ number_ones = {}
 total_listeners = {}
 duplicate_array = []
 setting = None
+
 if len(sys.argv) != 1:
 	if sys.argv[1] == "album":
 		setting = "album"
@@ -22,45 +23,52 @@ else:
 
 def get_duplicates(file, array):
 	for line in file:
-		songs = line.split("|")
-		stripped_songs = [j.strip("\n").strip(" ") for j in songs]
-		array.append(stripped_songs)
+		array.append([j.strip("\n").strip(" ") for j in line.split("|")])
 
 def fix_duplicates(song, array):
+	song = song.replace("[", "(").replace("]", ")")
+	song = song.replace("(Explicit)", "").replace("(Explicit Version)", "")
+	song = song.replace("(Clean)", "").replace("(Clean Version)", "")
+	song = song.replace("Ke$ha", "Kesha")
+	song = song.replace("ASAP Rocky", "A$AP Rocky")
+	song = song.replace(" to ", " To ")
 	if setting == "album":
-		song = song.replace("  ", " ")
 		song = song.replace("(Deluxe Edition)","")
 		song = song.replace("(Digital Deluxe Version)", "")
 		song = song.replace("(Deluxe Version)", "")
-		song = song.replace("(Explicit Version)", "")
-		song = song.replace("[Explicit]", "")
-		song = song.replace("(Explicit)", "")
 		song = song.replace("(Special Edition)", "")
 		song = song.replace("(International Deluxe)", "")
 		song = song.replace("(UK Deluxe)", "")
 		song = song.replace("(Platinum Edition)", "")
-		song = song.replace("[Clean]", "")
 		song = song.replace("(Deluxe)","")
 		song = song.replace("(Remastered)", "")
 		song = song.replace("(Extended)", "")
 		song = song.replace("(International Special Edition Version)", "")
 		song = song.replace("(Bonus Track Version)", "")
-		song = song.replace("[Platinum Edition]", "")
+		song = song.replace("(Platinum Edition)", "")
 		song = song.replace("(deluxe)", "")
-		song = song.replace("[+digital booklet]", "")
-		song = song.rstrip()
+		song = song.replace("(+digital booklet)", "")
 	elif setting == "song":
-		song = song.replace("  ", " ")
-		song = song.replace("[Explicit]", "")
-		song = song.replace("[Clean]", "")
+		song = song.replace("(Audio)", "")
+		song = song.replace("(Official Video)", "")
+		song = song.replace("(Official)", "")
+		song = song.replace("(Album Visual)", "")
+		song = song.replace("(Album Version)", "")
+		song = song.replace("(Radio Edit)", "")
+		song = song.replace(" - Single Version", "")
 		song = song.replace("Ft.", "feat.")
 		song = song.replace("Feat.", "feat.")
 		song = song.replace("ft.", "feat.")
-		song = song.rstrip()
+		song = song.replace(" f. ", " feat. ")
+		song = song.replace("Featuring", "feat.")
+		if (song.find(" feat.") > song.find(" - ")):
+			song = song.replace(" feat.", " (feat.")
+			song = song + ")"
+	song = song.replace("  ", " ")
+	song = song.rstrip()
 	for songs in array:
 		for i in range(len(songs) - 1):
-			check_song = songs[i]
-			if song == check_song:
+			if song == songs[i]:
 				return songs[-1]
 	return(song)
 
@@ -72,26 +80,29 @@ def parse_chart(chart, username):
 	except IndexError:
 		print(username + " does not have enough plays.")
 		return
-	counter = 9
-	try:
-		end_weight = chart[counter].weight
-		curr_weight = end_weight
-		while curr_weight == end_weight:
-			counter += 1
-			curr_weight = chart[counter].weight
-		counter -=1
-	except IndexError:
-		pass
-	for i in range(counter):
-		song = fix_duplicates(str(chart[i].item), duplicate_array)
-		weight = chart[i].weight
+	counter = 0
+	old_weight = 0
+	while True:
+		song = fix_duplicates(str(chart[counter].item), duplicate_array)
+		weight = chart[counter].weight
 		found = False
+		if ((weight != old_weight) and (len(temp_rank) > 9)):
+			break
 		for i in range(len(temp_rank)):
 			if song in temp_rank[i]:
 				temp_rank[i] = (song, weight + temp_rank[i][1])
 				found = True
 		if not found:
 			temp_rank.append((song, weight))
+		if (counter >= len(chart) - 1):
+			break
+		old_weight = weight
+		counter += 1
+	try: 
+		temp_rank[9]
+	except IndexError:
+		print(username + " does not have enough plays.")
+		return
 	res = {}
 	prev = None
 	for i,(k,v) in enumerate(temp_rank):
@@ -190,5 +201,6 @@ def main():
 			outputfile.write(str(number_ones[name]) + "|" + str(total_listeners[name]) + "\n")
 			del rank[name]
 		outputfile.close()
+	print("current time is: " + datetime.datetime.fromtimestamp(int(time.time())).strftime('%Y-%m-%d %H:%M:%S'))
 main()
 
