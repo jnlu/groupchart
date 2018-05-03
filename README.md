@@ -68,6 +68,6 @@ Kali Uchis - Miami|Kali Uchis, Bia - Miami|Kali Uchis - Miami (feat. BIA)
 
 Here are other features that I hope to implement:
 
-  - An online version of groupchart sometime this summer.
-  - More options, such as a way to easily set how many songs the program checks for in each user’s plays, as well as an easy way to set the timeframe, such as by just indicating you would like the chart for last week or last month.
+  - An online version, letting more people access it
+  - More options, such as a way set how many songs the program checks for in each user as opposed to ten, as well as an easy way to set the timeframe, such as by just indicating you would like the chart for last week or last month
   - General runtime improvements, namely with the song sorting and the API calls
