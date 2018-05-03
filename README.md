@@ -50,7 +50,9 @@ You can find the groupchart program at this github repository. To use the progra
   
   Not all duplicates will be fixed automatically. Additional duplicates can be recorded in the aforementioned file “song_duplicates.txt”. Each line has a different set of duplicates that correspond to the same song, with each title separated by a “|” character. The last title in each line should be the title you wish to set all of the duplicate song titles as. For example, one possible line could be:
  
-          Kali Uchis - Miami|Kali Uchis, Bia - Miami|Kali Uchis - Miami (feat. BIA)
+```
+Kali Uchis - Miami|Kali Uchis, Bia - Miami|Kali Uchis - Miami (feat. BIA)
+```
 
   If the program encounters any title in a given line, it will set the title to the last title in the line. For example, if “Kali Uchis – Miami” is found in a user’s songs, the program will change it to “Kali Uchis – Miami (feat. BIA)”. Sometimes a user will scrobble the same song under multiple titles, in which case the program will sum up their plays and distribute points accordingly.
   
