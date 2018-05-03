@@ -1,0 +1,8 @@
+username = "[USERNAME]"
+password = "[PASSWORD]"
+API_KEY = "[KEY]"
+API_SECRET = "[SECRET]"
+fromdate = "1524744000"
+todate = "1525348799"
+fromdatealbum = "1522540800"
+todatealbum = "1525132799"
