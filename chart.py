@@ -13,14 +13,6 @@ total_listeners = {}
 duplicate_array = []
 setting = None
 
-if len(sys.argv) != 1:
-	if sys.argv[1] == "album":
-		setting = "album"
-	else:
-		setting = "song"
-else:
-	setting = "song"
-
 def get_duplicates(file, array):
 	for line in file:
 		array.append([j.strip("\n").strip(" ") for j in line.split("|")])
@@ -150,6 +142,15 @@ def parse_chart(chart, username):
 
 def main():
 	if __name__ == '__main__':
+
+		if len(sys.argv) != 1:
+			if sys.argv[1] == "album":
+				setting = "album"
+			else:
+				setting = "song"
+		else:
+			setting = "song"
+			
 		names = open("lastfm.txt", "r") #A text file where each line is a username
 		
 		duplicates = open(setting + "_duplicates.txt", "r")
@@ -236,3 +237,4 @@ def main():
 	print("current time is: " + datetime.datetime.fromtimestamp(int(time.time())).strftime('%Y-%m-%d %H:%M:%S'))
 	print("%d rejected out of %d (%.2f%%)"%(num_rejected, total, percentage))
 main()
+
