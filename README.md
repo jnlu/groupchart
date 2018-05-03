@@ -1,6 +1,6 @@
 # Summary
 
-Groupchart was created to replace last.fm’s community functunality, which has not been available for several years. With it, users can create a chart that shows which songs or albums were most popular for a group of users within a certain timeframe. Groupchart is a popular weekly feature in online communities such as ATRL and Reddit, with thousands of users currently being tracked to create weekly song charts.
+Groupchart was created to replace last.fm’s community functunality, which has not been available for several years. With groupchart, users can create a music chart that showcases which songs or albums were most popular for a group of users within a certain timeframe. Groupchart is a popular feature in online communities such as ATRL and Reddit, with thousands of users currently being tracked to create weekly song charts.
 
 # Requirements
 
