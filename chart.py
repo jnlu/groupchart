@@ -32,6 +32,17 @@ def fix_duplicates(song, array):
 	song = song.replace("Ke$ha", "Kesha")
 	song = song.replace("ASAP Rocky", "A$AP Rocky")
 	song = song.replace(" to ", " To ")
+	song = song.replace(" of ", " Of ")
+	song = song.replace(" the ", " The ")
+	song = song.replace("’", "\'")
+	song = song.replace("ロード", "Lorde")
+	song = song.replace(" - Single", "")
+	song = song.replace("N*E*R*D", "N.E.R.D")
+	song = song.replace("Ft.", "feat.")
+	song = song.replace("Feat.", "feat.")
+	song = song.replace("ft.", "feat.")
+	song = song.replace(" f. ", " feat. ")
+	song = song.replace("Featuring", "feat.")
 	if setting == "album":
 		song = song.replace("(Deluxe Edition)","")
 		song = song.replace("(Digital Deluxe Version)", "")
@@ -48,19 +59,23 @@ def fix_duplicates(song, array):
 		song = song.replace("(Platinum Edition)", "")
 		song = song.replace("(deluxe)", "")
 		song = song.replace("(+digital booklet)", "")
+		song = song.replace("(U.S. Version)", "")
+		if "Black Panther" in song and "The Album" in song:
+			song = "Various Artists - Black Panther: The Album – Music from and Inspired By"
 	elif setting == "song":
 		song = song.replace("(Audio)", "")
+		song = song.replace("(Official Audio)", "")
 		song = song.replace("(Official Video)", "")
+		song = song.replace("(Lyric Video)", "")
 		song = song.replace("(Official)", "")
 		song = song.replace("(Album Visual)", "")
 		song = song.replace("(Album Version)", "")
 		song = song.replace("(Radio Edit)", "")
 		song = song.replace(" - Single Version", "")
-		song = song.replace("Ft.", "feat.")
-		song = song.replace("Feat.", "feat.")
-		song = song.replace("ft.", "feat.")
-		song = song.replace(" f. ", " feat. ")
-		song = song.replace("Featuring", "feat.")
+		song = song.replace("(CDQ)", "")
+		song = song.replace(" - Radio Edit", "")
+		song = song.replace(" - Edit", "")
+		song = song.replace(" (Original Version)", "")
 		if (song.find(" feat.") > song.find(" - ")):
 			song = song.replace(" feat.", " (feat.")
 			song = song + ")"
@@ -68,6 +83,7 @@ def fix_duplicates(song, array):
 	song = song.rstrip()
 	for songs in array:
 		for i in range(len(songs) - 1):
+			songs[i] = songs[i].replace("(divider)", "|")
 			if song == songs[i]:
 				return songs[-1]
 	return(song)
@@ -79,17 +95,18 @@ def parse_chart(chart, username):
 		chart[9]
 	except IndexError:
 		print(username + " does not have enough plays.")
-		return
+		return(1)
 	counter = 0
 	old_weight = 0
 	while True:
 		song = fix_duplicates(str(chart[counter].item), duplicate_array)
 		weight = chart[counter].weight
+
 		found = False
 		if ((weight != old_weight) and (len(temp_rank) > 9)):
 			break
 		for i in range(len(temp_rank)):
-			if song in temp_rank[i]:
+			if song == temp_rank[i][0]:
 				temp_rank[i] = (song, weight + temp_rank[i][1])
 				found = True
 		if not found:
@@ -102,7 +119,7 @@ def parse_chart(chart, username):
 		temp_rank[9]
 	except IndexError:
 		print(username + " does not have enough plays.")
-		return
+		return(1)
 	res = {}
 	prev = None
 	for i,(k,v) in enumerate(temp_rank):
@@ -129,6 +146,7 @@ def parse_chart(chart, username):
 		total_listeners[song] += 1
 		if rank == 15:
 			number_ones[song] += 1
+	return(0)
 
 def main():
 	if __name__ == '__main__':
@@ -145,11 +163,12 @@ def main():
 		username = lastfmsettings.username
 		password_hash = pylast.md5(lastfmsettings.password)
 
-		from_date = "1501761600" #Edit these to run at different times - time is in unix
-		to_date = "1502366399"
+		from_date = lastfmsettings.fromdate
+		to_date = lastfmsettings.todate
 
-		#from_date = "1498867200"
-		#to_date = "1501545599"
+		if setting == "album":
+			from_date = lastfmsettings.fromdatealbum
+			to_date = lastfmsettings.todatealbum
 
 		timerange = datetime.datetime.fromtimestamp(int(from_date)).strftime('%Y-%m-%d %H:%M:%S') + " to " + datetime.datetime.fromtimestamp(int(to_date)).strftime('%Y-%m-%d %H:%M:%S')
 		print("current time is: " + datetime.datetime.fromtimestamp(int(time.time())).strftime('%Y-%m-%d %H:%M:%S'))
@@ -158,7 +177,7 @@ def main():
 		usernames = []
 
 		for line in names:
-			name = line.strip("\n").strip()
+			name = line.strip("\n").strip().lower()
 			if name not in usernames:
 				usernames.append(name)
 			else:
@@ -167,40 +186,53 @@ def main():
 
 		network = pylast.LastFMNetwork(api_key=API_KEY, api_secret=API_SECRET, username=username, password_hash=password_hash)
 
+		total = 0
+		sum_total = len(usernames)
+		num_rejected = 0
+
 		for username in usernames:
 			user = network.get_user(username)
+			total += 1
 			if setting == "album":
 				try:
 					chart = user.get_weekly_album_charts(from_date=from_date, to_date=to_date)
 				except pylast.WSError:
 					print(str(user) + " was not found.")
+					num_rejected += 1
 					continue
 				else:
-					parse_chart(chart, user)
+					num_rejected += parse_chart(chart, user)
 			elif setting == "song":
 				try:
 					chart = user.get_weekly_track_charts(from_date=from_date, to_date=to_date)
 				except pylast.WSError:
 					print(str(user) + " was not found.")
+					num_rejected += 1
 					continue
 				else:
-					parse_chart(chart, user)
-		chart_full_temp = reversed(sorted(chart_full.items(), key=operator.itemgetter(1)))
+					num_rejected += parse_chart(chart, user)
+		chart_full_temp = reversed(sorted(chart_full.items(), key=lambda x:(x[1], int(total_listeners[str(x[0])]), int(number_ones[str(x[0])]))))
 		rank = {}
 		prev = None
+		prev_t = None
+		prev_n = None
 		outputfile = open(setting + "_chart.txt", "w")
 		outputfile.write("Rank|" + setting.title() + "|Total Points|Number Ones|Total Listeners\n---|---|---|---|---|---\n")
 		for i,(k,v) in enumerate(chart_full_temp):
-			if v!=prev:
-				place,prev = i+1,v
-			rank[k] = place
+			if v == prev and total_listeners[k] == prev_t and number_ones[k] == prev_n:
+				rank[k] = place
+				prev,prev_t,prev_n = v,total_listeners[k],number_ones[k]
+			else:
+				place,prev,prev_t,prev_n = i+1,v,total_listeners[k],number_ones[k]
+				rank[k] = place
 		for i in range(len(rank)):
-			song = min(rank.items(), key=operator.itemgetter(1))
+			song = min(rank.items(), key=lambda x:(x[1], str(x[0]).lower()))
 			name = str(song[0])
 			outputfile.write(str(song[1]) + "|" + name + "|" + str(float(chart_full.get(name))) + "|")
 			outputfile.write(str(number_ones[name]) + "|" + str(total_listeners[name]) + "\n")
 			del rank[name]
 		outputfile.close()
+		percentage = float(100 - (float(num_rejected) * 100 / float(total)))
 	print("current time is: " + datetime.datetime.fromtimestamp(int(time.time())).strftime('%Y-%m-%d %H:%M:%S'))
+	print("%d rejected out of %d (%.2f%%)"%(num_rejected, total, percentage))
 main()
-
