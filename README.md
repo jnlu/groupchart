@@ -8,7 +8,7 @@ Groupchart was created to replace last.fm’s community functunality, which has 
 
 # Set Up
  
-You can find the groupchart program at this github repository. To use the program, you will need to create three additional files:
+You can find the groupchart program in [its github repository](https://github.com/jnlu/groupchart). To use the program, you will need to create three additional files:
 
   - A text file that contains the list of last.fm usernames you wish to include in your chart. Each username should be in its own separate line, with no additional text. Name this file “lastfm.txt”. There is an example with the same name in the github repository.
   - A text file containing song duplicates, i.e. different titles that correspond to one song. Each line represents one set of titles, with individual titles separated by the “|” character. Name this file “song_duplicates.txt”. See [the Duplicates section](https://github.com/jnlu/groupchart/blob/master/README.md#duplicates) for more information and the repository for an example .
