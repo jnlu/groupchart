@@ -226,12 +226,11 @@ def main():
 			else:
 				place,prev,prev_t,prev_n = i+1,v,total_listeners[k],number_ones[k]
 				rank[k] = place
-		for i in range(len(rank)):
-			song = min(rank.items(), key=lambda x:(x[1], str(x[0]).lower()))
+		sorted_rank_temp = sorted(rank.items(), key=lambda x:(x[1], str(x[0]).lower()))
+		for song in sorted_rank_temp:
 			name = str(song[0])
 			outputfile.write(str(song[1]) + "|" + name + "|" + str(float(chart_full.get(name))) + "|")
 			outputfile.write(str(number_ones[name]) + "|" + str(total_listeners[name]) + "\n")
-			del rank[name]
 		outputfile.close()
 		percentage = float(100 - (float(num_rejected) * 100 / float(total)))
 	print("current time is: " + datetime.datetime.fromtimestamp(int(time.time())).strftime('%Y-%m-%d %H:%M:%S'))
