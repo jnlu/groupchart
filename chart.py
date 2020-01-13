@@ -140,6 +140,64 @@ def parse_chart(chart, username):
 			number_ones[song] += 1
 	return(0)
 
+def parse_chart_2(chart, username):
+	username = str(username)
+	max_points = 51
+	temp_rank = []
+	print(len(chart))
+	try:
+		chart[9]
+	except IndexError:
+		print(username + " does not have enough plays; has " + str(len(chart)))
+		return(1)
+	counter = 0
+	while True:
+		song = fix_duplicates(str(chart[counter].item), duplicate_array)
+		weight = chart[counter].weight
+
+		found = False
+		for i in range(len(temp_rank)):
+			if song == temp_rank[i][0]:
+				temp_rank[i] = (song, weight + temp_rank[i][1])
+				found = True
+		if not found:
+			temp_rank.append((song, weight))
+		if (counter >= len(chart) - 1):
+			break
+		counter += 1
+	try: 
+		temp_rank[9]
+	except IndexError:
+		print(username + " does not have enough plays; has " + str(len(temp_rank)))
+		return(1)
+	res = {}
+	prev = None
+	for i,(k,v) in enumerate(temp_rank):
+		if v!=prev:
+			place,prev = i+1,v
+		res[k] = place
+	all_placements = res.values()
+	for song in res:
+		weight = res[song]
+		total = all_placements.count(weight)
+		if total > 1:
+			last_place = weight + total - 1
+			average = float(weight + last_place) / 2
+			rank = float(max(max_points - average, 1))
+		else:
+			rank = float(max(max_points - weight, 1))
+		if song not in chart_full:
+			chart_full[song] = 0.0
+		chart_full[song] += rank
+		if song not in number_ones:
+			number_ones[song] = 0
+		if song not in total_listeners:
+			total_listeners[song] = 0
+		total_listeners[song] += 1
+		if rank == max_points - 1:
+			number_ones[song] += 1
+	return(0)
+
 def main():
 	if __name__ == '__main__':
 
