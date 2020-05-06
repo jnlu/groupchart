@@ -297,7 +297,7 @@ def main():
 		prev = None
 		prev_t = None
 		prev_n = None
-		outputfile = open(setting + "_chart_" + str(from_date) + "_" + str(to_date) +".txt", "w")
+		outputfile = open(setting + "_chart_" + str(from_date) + "_" + str(to_date) +".txt", mode="w", errors="ignore")
 		outputfile.write("Rank|" + setting.title() + "|Total Points|Number Ones|Total Listeners\n---|---|---|---|---|---\n")
 		for i,(k,v) in enumerate(chart_full_temp):
 			if v == prev and total_listeners[k] == prev_t and number_ones[k] == prev_n:
@@ -332,4 +332,3 @@ def main():
 			print("Cleaned dupes")
 			print("%d dups unused out of %d in file (%.2f%%)"%(remaining_dups, total_dup_targets, duppercentage))
 main()
-
