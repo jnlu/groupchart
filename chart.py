@@ -182,7 +182,7 @@ def parse_chart(chart, username, errorfile):
 		if v!=prev:
 			place,prev = i+1,v
 		res[k] = place
-	all_placements = res.values()
+	all_placements = list(res.values())
 	for song in res:
 		weight = res[song]
 		total = all_placements.count(weight)
@@ -332,3 +332,4 @@ def main():
 			print("Cleaned dupes")
 			print("%d dups unused out of %d in file (%.2f%%)"%(remaining_dups, total_dup_targets, duppercentage))
 main()
+
