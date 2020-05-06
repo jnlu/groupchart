@@ -9,11 +9,13 @@ Groupchart was created to replace last.fm’s community functunality, which has 
 
 # Set Up
  
-You can find the groupchart program in [its github repository](https://github.com/jnlu/groupchart). To use the program, you will need to create two additional files:
+You can find the groupchart program in [its github repository](https://github.com/jnlu/groupchart). To use the program, you will need to create these additional files:
 
   - A text file that contains the list of last.fm usernames you wish to include in your chart. Each username should be in its own separate line, with no additional text. Name this file “lastfm.txt”. There is [an example with the same name](https://github.com/jnlu/groupchart/blob/master/examples/lastfm.txt) in the github repository.
   - A Python file containing your last.fm settings. You will need to provide your username, your password, and your two API keys, which you can request at last.fm/api. You will also set your desired timeframe for your chart here, which needs to be given in Unix time. Name this file “lastfmsettings.py”. Look at [the example with the same file name](https://github.com/jnlu/groupchart/blob/master/examples/lastfmsettings.py) in the repository to see how to set these parameters.
     - There are [several websites](https://www.epochconverter.com/) that convert times and dates into Unix time.
+  - A text file containing song name duplicates. See the Duplicates section.
+  - A text file containing songs to exclude from the chart. See the Exclusions section.
  
   These files should be all be saved in the same folder as the chart program. Again, see the github repository for examples of  these files.
  
