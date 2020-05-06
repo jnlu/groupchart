@@ -4,7 +4,7 @@ Groupchart was created to replace last.fm’s community functunality, which has 
 
 # Requirements
 
-  - Python 2.7
+  - Python 2.7 or 3
   - [The pylast interface](https://github.com/pylast/pylast)
 
 # Set Up
